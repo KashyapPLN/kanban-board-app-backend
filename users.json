@@ -1,0 +1,32 @@
+[
+    {
+      "name": "John Doe",
+      "team": "Programming",
+      "profilePicture": "https://randomuser.me/api/portraits/men/75.jpg"
+    },
+    {
+      "name": "Jane Smith",
+      "team": "Design",
+      "profilePicture": "https://randomuser.me/api/portraits/women/76.jpg"
+    },
+    {
+      "name": "Michael Johnson",
+      "team": "Programming",
+      "profilePicture": "https://randomuser.me/api/portraits/men/77.jpg"
+    },
+    {
+      "name": "Emily Davis",
+      "team": "Design",
+      "profilePicture": "https://randomuser.me/api/portraits/women/78.jpg"
+    },
+    {
+      "name": "William Wilson",
+      "team": "Programming",
+      "profilePicture": "https://randomuser.me/api/portraits/men/79.jpg"
+    },
+    {
+      "name": "Olivia Taylor",
+      "team": "Design",
+      "profilePicture": "https://randomuser.me/api/portraits/women/80.jpg"
+    }
+  ]
