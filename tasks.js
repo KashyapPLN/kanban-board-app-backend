@@ -65,21 +65,57 @@ router.get('/:boardId/:sectionId', async (req, res) => {
 });
 
 // update task
-router.put('/:taskId', async (req, res) => {
+router.put('/:boardId/:sectionId/:taskId', async (req, res) => {
     try {
-        const { taskId } = req.params;
-        const { name, dueDate, assignee } = req.body;
-        const task = await client.db('Kanban-board-app').collection('Tasks').findOne({ _id: new ObjectId(taskId) });
-        if (!task) {
+        const { boardId, sectionId, taskId } = req.params;
+        const { name, dueDate, assignee, description } = req.body;
+        const objectIdBoard = new ObjectId(boardId);
+        const objectIdSection = new ObjectId(sectionId);
+        const objectIdTask = new ObjectId(taskId);
+        const board = await client.db('Kanban-board-app').collection('Boards').findOne({ _id: objectIdBoard });
+
+        if (!board) {
+            return res.status(404).json({ error: 'Board not found' });
+        }
+        const sectionIndex = board.sections.findIndex(section => section._id.equals(objectIdSection));
+        if (sectionIndex === -1) {
+            return res.status(404).json({ error: 'Section not found' });
+        }
+        const section = board.sections[sectionIndex];
+        const taskIndex = section.tasks.findIndex(task => {
+            return task._id.toString() === taskId;
+        });
+        if (taskIndex === -1) {
             return res.status(404).json({ error: 'Task not found' });
         }
-        const updatedTask = {
-            name,
-            dueDate,
-            assignee
+        const updatedFields = {
+            'sections.$[section].tasks.$[task].name': name,
+            'sections.$[section].tasks.$[task].dueDate': dueDate,
+            'sections.$[section].tasks.$[task].assignee': assignee,
+            'sections.$[section].tasks.$[task].description': description
         };
-        await client.db('Kanban-board-app').collection('Tasks').updateOne({ _id: new ObjectId(taskId) }, { $set: updatedTask });
-        res.json(updatedTask);
+        await client
+            .db('Kanban-board-app')
+            .collection('Boards')
+            .updateOne(
+                { _id: objectIdBoard },
+                { $set: updatedFields },
+                {
+                    arrayFilters: [
+                        { 'section._id': objectIdSection },
+                        { 'task._id': objectIdTask }
+                    ]
+                }
+            );
+            const updatedBoard = await client
+            .db('Kanban-board-app')
+            .collection('Boards')
+            .findOne(
+                { _id: objectIdBoard },
+                { projection: { sections: 1 } }
+            );
+
+        res.json(updatedBoard.sections);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
